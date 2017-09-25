@@ -4,20 +4,22 @@ import itertools
 
 
 def piecewise(z):
-    x = [xs for xs,ys in z]
-    y = [ys for xs,ys in z]
+    x = np.array([xs for xs,ys in z])
+    y = np.array([ys for xs,ys in z])
     models = []
-
+   
     ## all combinations of models
-    i = range(0,len(x))
+    i = set(x)
+    i = list(i)
+    i.sort()
+
     for ia, ib in itertools.combinations(i,2):
-        ya = y[:ia]
-        yc = y[ib:]
-        yb = y[ia:ib]
-        xa = x[:ia]
-        xc = x[ib:]
-        xb = x[ia:ib]
-        
+        ya = y[x <= ia]
+        yc = y[x >= ib]
+        yb = y[(x >= ia) & (x<= ib)]
+        xa = x[x <= ia]
+        xc = x[x >= ib]
+        xb = x[(x >=ia) & (x<= ib)]
         #print xa, xb, xc
         #print ya, yb, yc
 
@@ -30,7 +32,7 @@ def piecewise(z):
         se_a = sum(a - ya)**2
         se_c = sum(c - yc)**2
         reg_b = r_value**2
-        if slope > 0:
+        if slope > 1:
         ## totals
             total_error = (se_a, reg_b, se_c)
             models.append((total_error,(ia,ib,slope)))

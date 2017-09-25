@@ -56,10 +56,10 @@ o
 
 #### Mike helped me write code on how to find breakpoints that better fit a step model these are the breakpoints from my code, I think they look a lot better :) Here we force two points of refrence and then find the points inbetween that best fit a linear model and the two fixed points. Three segments a:ab,b:bc,and c:cd. Find A and C breakpoints with lowest SE and B to C slope with lowest r-sqaured value. A and C are forced to stay constant, min and max.
 ```{r}
-ggplot(data = xylem_count, aes(VND7_log, y=percent_xylem )) + geom_segment(y= 0, x= 0, xend = 5.312184, yend = 0, color="grey") +geom_segment(y= 85.29761, x= 6.585654, xend = 10, yend = 85.29761, color="grey") +  geom_segment(x= 5.312184, y= 0, xend = 6.585654, yend = 85.29761, color="grey") + geom_jitter(alpha = 0.7, size=0.2, shape = 4) + theme_bw() + theme(legend.position ="none", text=element_text(size=7), panel.margin = unit(0, "cm"), axis.ticks = element_line(size = 0.1), axis.line = element_line(size = 0.1), axis.ticks.length = unit(0.05, "cm"), axis.ticks.margin =unit(0, "cm")) + xlab(NULL) + ylab(NULL)
+ggplot(data = xylem_count, aes(VND7_log, y=percent_xylem )) + geom_segment(y= 0, x= 0, xend = 4.8772339999999996, yend = 0, color="grey") +geom_segment(y= 85.29761, x= 5.3666520000000002, xend = 10, yend = 85.29761, color="grey") +  geom_segment(x= 4.8772339999999996, y= 0, xend = 5.3666520000000002, yend = 85.29761, color="grey") + geom_jitter(alpha = 0.7, size=0.2, shape = 4) + theme_bw() + theme(legend.position ="none", text=element_text(size=7), panel.margin = unit(0, "cm"), axis.ticks = element_line(size = 0.1), axis.line = element_line(size = 0.1), axis.ticks.length = unit(0.05, "cm"), axis.ticks.margin =unit(0, "cm")) + xlab(NULL) + ylab(NULL)
 
-x <- sort(xylem$VND7_log)[29:50]
-y <- xylem$percent_xylem[order(xylem$VND7_log)][29:50]
+x <- sort(xylem$VND7_log)[21:34]
+y <- xylem$percent_xylem[order(xylem$VND7_log)][21:34]
 
 summary(lm(y~x))
 
@@ -67,7 +67,7 @@ summary(lm(y~x))
  lm(y ~ x)$coeff[2]
 ```
 
-####Here we see a much better fit to the data. This suggest that the slope is 16. Is there a way of measuring that 16 is a steep slope? Or can we say our slope is 16 this is a steep slope suggesting a switch like function? I still need to re-run this with the x-axis logged but need to re-go through all the images to do this. Since I did not include the unchanged xylem in my orginal anaysis just ectopic xylem formation. I need this information so both the count data and percentage do not start at zero and can be logged.
+####Here we see a much better fit to the data. This suggest that the slope is 22. Is there a way of measuring that 22 is a steep slope? Or can we say our slope is 22 this is a steep slope suggesting a switch like function? I still need to re-run this with the x-axis logged but need to re-go through all the images to do this. Since I did not include the unchanged xylem in my orginal anaysis just ectopic xylem formation. I need this information so both the count data and percentage do not start at zero and can be logged.
 
 #### Stochastic noise and variance for a switch with log-log values expect to see low noise at the min and max vlaues and more noise at switch. We expect the SE at these points to be double  if switch and half the amount if the relationship is more linear.
 

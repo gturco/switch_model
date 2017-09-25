@@ -1,0 +1,100 @@
+---
+title: "Meeting_with_Mike_9_28_2017"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+#### loading in of data
+
+```{r}
+xylem <- read.table("/Users/gturco/Documents/Projects/z_stack/data/experiments/all_d.txt", header=TRUE)
+xylem_count <- read.table("/Users/gturco/Documents/Projects/z_stack/data/experiments/count_d.txt", header=TRUE)
+xylem_count_logged <- read.table("/Users/gturco/Documents/Projects/z_stack/data/experiments/all_d_no_zero.txt", header=TRUE)
+
+
+xylem <- as.data.frame(xylem)
+xylem$VND7_log = log2(xylem$VND7)
+
+xylem_count <- as.data.frame(xylem_count)
+xylem_count$VND7_log = log2(xylem_count$VND7)
+
+
+xylem_count_logged <- as.data.frame(xylem_count_logged)
+xylem_count_logged$VND7_log = log2(xylem_count_logged$VND7)
+xylem_count_logged$percent_xylem = log2(xylem_count_logged$percent_xylem)
+
+```
+
+#### Here I ran the  R segemented pakage to run a a pieacewise linear regression on my data. I told it to caluclate two breakpoints, the graph below shows the two it picked.  Mike and I agree that it looks like there are 4 breaks here rather than 2 and that the fit could be much better.
+
+```{r}
+library(segmented)
+library(ggplot2)
+
+out.lm <- lm(percent_xylem ~ VND7_log, data = xylem)
+o <- segmented(out.lm, seg.Z = ~VND7_log , psi = list(VND7_log = c(4,5)),
+  control = seg.control(display = FALSE)
+)
+
+dat2 = data.frame(x = xylem$VND7_log, y = broken.line(o)$fit)
+
+ p <- ggplot(data = xylem, aes(xylem$VND7_log, y = broken.line(o)$fit))+ geom_jitter(data = xylem, aes(xylem$VND7_log, y = xylem$percent_xylem),alpha = 0.7,  shape = 4)  
+ 
+p + geom_line(data = dat2, color = 'blue')
+```
+
+#### This gives a p-value for breakpoints in model, I might use this to test for switch in transcriptional data
+```{r}
+davies.test(out.lm, seg.Z = ~VND7_log , k=4)
+```
+### These are the breakpoints 
+```{r}
+o
+```
+
+
+#### Mike helped me write code on how to find breakpoints that better fit a step model these are the breakpoints from my code, I think they look a lot better :) Here we force two points of refrence and then find the points inbetween that best fit a linear model and the two fixed points. Three segments a:ab,b:bc,and c:cd. Find A and C breakpoints with lowest SE and B to C slope with lowest r-sqaured value. A and C are forced to stay constant, min and max.
+```{r}
+ggplot(data = xylem_count, aes(VND7_log, y=percent_xylem )) + geom_segment(y= 0, x= 0, xend = 5.312184, yend = 0, color="grey") +geom_segment(y= 85.29761, x= 6.585654, xend = 10, yend = 85.29761, color="grey") +  geom_segment(x= 5.312184, y= 0, xend = 6.585654, yend = 85.29761, color="grey") + geom_jitter(alpha = 0.7, size=0.2, shape = 4) + theme_bw() + theme(legend.position ="none", text=element_text(size=7), panel.margin = unit(0, "cm"), axis.ticks = element_line(size = 0.1), axis.line = element_line(size = 0.1), axis.ticks.length = unit(0.05, "cm"), axis.ticks.margin =unit(0, "cm")) + xlab(NULL) + ylab(NULL)
+
+x <- sort(xylem$VND7_log)[29:50]
+y <- xylem$percent_xylem[order(xylem$VND7_log)][29:50]
+
+summary(lm(y~x))
+
+## Slope
+ lm(y ~ x)$coeff[2]
+```
+
+####Here we see a much better fit to the data. This suggest that the slope is 16. Is there a way of measuring that 16 is a steep slope? Or can we say our slope is 16 this is a steep slope suggesting a switch like function? I still need to re-run this with the x-axis logged but need to re-go through all the images to do this. Since I did not include the unchanged xylem in my orginal anaysis just ectopic xylem formation. I need this information so both the count data and percentage do not start at zero and can be logged.
+
+#### Stochastic noise and variance for a switch with log-log values expect to see low noise at the min and max vlaues and more noise at switch. We expect the SE at these points to be double  if switch and half the amount if the relationship is more linear.
+
+#### This is what I have so far for binning data but need to repeat with log-log values
+
+```{r}
+
+## to make the same order we see when ploting
+x_axis <- xylem$VND7_log
+y_axis <- xylem$percent_xylem
+window_size <- 0.5
+windows <- seq(min(x_axis),max(x_axis), by = window_size)
+
+get_stats <- function(w, x_axis,y_axis, window_size) {
+  cord <- which(x_axis >= w & x_axis <= w+ window_size)
+  print(cord)
+  se = sd(y_axis[cord])/length(y_axis[cord])
+  return(se)
+  #return(c(se,mean(y_axis[cord])))
+
+}
+
+
+y <- lapply(windows,get_stats, x_axis=x_axis, y_axis=y_axis,window_size=window_size )
+SE <- unlist(y)
+z <- data.frame(SE,windows)
+z <- na.omit(z)
+
+ggplot(z,aes(windows,SE)) + geom_point()
+```

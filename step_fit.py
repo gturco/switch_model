@@ -51,6 +51,8 @@ def best_model(models_all):
     total_error, other = models_all[order[0]]
     a_fit, r, c_fit = total_error
     b_start, b_end, slope, a_mean, c_mean = other
+    return  a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r
+
 ## we want model where 3 numbers are min & longest steady-state
 
 #x = [1,2,3,4,5,6,7]

@@ -3,7 +3,10 @@ from scipy import stats
 import itertools
 
 
-def piecewise(z):
+def piecewise(xi,yi):
+    z = zip(xi,yi)
+    z.sort()
+
     x = np.array([xs for xs,ys in z])
     y = np.array([ys for xs,ys in z])
     models = []
@@ -35,7 +38,7 @@ def piecewise(z):
         if slope > 1:
         ## totals
             total_error = (se_a, reg_b, se_c)
-            models.append((total_error,(ia,ib,slope)))
+            models.append((total_error,(ia,ib,slope, a, c )))
     return models
 
 
@@ -45,8 +48,9 @@ def best_model(models_all):
     norml = models/m
     total = np.sum(norml, axis = 1)
     order = np.argsort(total)
-    print models_all[order[0]]
-
+    total_error, other = models_all[order[0]]
+    a_fit, r, c_fit = total_error
+    b_start, b_end, slope, a_mean, c_mean = other
 ## we want model where 3 numbers are min & longest steady-state
 
 #x = [1,2,3,4,5,6,7]
@@ -64,9 +68,19 @@ y = [0.00000 ,  0.00000,  85.98190  ,93.11778,   0.00000   ,0.00000 ,  0.00000, 
 85.97513  , 0.00000  ,72.91498 ,  0.00000, 100.00000 ,  0.00000  ,89.06269  , 0.00000 ,  0.00000  , 0.00000,   0.00000  , 0.00000 ,  0.00000  , 0.00000,
 100.00000 ,100.00000 ,100.00000,  99.52622 , 94.73365,   0.00000]
 
-z = zip(x,y)
-z.sort()
-d = piecewise(z)
+#def gene_expression_matrix(dataset):
+#    # open file
+#    d =
+#    v = d[vnd7]
+#    for gene in colnames():
+#        ## run davis test
+#        y = d[gene]
+#        p = piecewise(v,y)
+#        a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r = best_model(p)
+#        ##A_mean, A_fit, B_mean, B_fit, C_start, C_end, Slope, r2, davids_test
+#        line = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\n".format(0,1,2,3,4,5,6,7,8)
+
+d = piecewise(x,y)
 best_model(d)
 
 

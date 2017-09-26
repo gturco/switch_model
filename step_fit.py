@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import stats
 import itertools
-
+import pandas as pd
 
 def piecewise(xi,yi):
     z = zip(xi,yi)
@@ -70,20 +70,27 @@ y = [0.00000 ,  0.00000,  85.98190  ,93.11778,   0.00000   ,0.00000 ,  0.00000, 
 85.97513  , 0.00000  ,72.91498 ,  0.00000, 100.00000 ,  0.00000  ,89.06269  , 0.00000 ,  0.00000  , 0.00000,   0.00000  , 0.00000 ,  0.00000  , 0.00000,
 100.00000 ,100.00000 ,100.00000,  99.52622 , 94.73365,   0.00000]
 
-#def gene_expression_matrix(dataset):
-#    # open file
-#    d =
-#    v = d[vnd7]
-#    for gene in colnames():
-#        ## run davis test
-#        y = d[gene]
-#        p = piecewise(v,y)
-#        a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r = best_model(p)
-#        ##A_mean, A_fit, B_mean, B_fit, C_start, C_end, Slope, r2, davids_test
-#        line = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\n".format(0,1,2,3,4,5,6,7,8)
-
-d = piecewise(x,y)
-best_model(d)
+#d = piecewise(x,y)
+#best_model(d)
 
 
-#print d
+
+def gene_expression_matrix(dataset):
+    # open file
+    df = pd.read_table(dataset)
+    v = df['vnd7']
+    for column in df:
+        ## run davis test
+        print column
+        y = df[column]
+        m = piecewise(v,y)
+        a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r = best_model(m)
+        davids = 1
+        ##A_mean, A_fit, B_mean, B_fit, C_start, C_end, Slope, r2, davids_test
+        line = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}".format(a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r, davids)
+        print line
+
+
+d = "/Users/gturco/Documents/Projects/switch_model/data/test.txt"
+gene_expression_matrix(d)
+

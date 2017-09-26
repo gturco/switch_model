@@ -44,14 +44,17 @@ def piecewise(xi,yi):
 
 def best_model(models_all):
     models = [m for m,i in models_all]
-    m = np.amax(models, axis=0)
-    norml = models/m
-    total = np.sum(norml, axis = 1)
-    order = np.argsort(total)
-    total_error, other = models_all[order[0]]
-    a_fit, r, c_fit = total_error
-    b_start, b_end, slope, a_mean, c_mean = other
-    return  a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r
+    if len(models) <= 0:
+        return np.repeat("NA" , 8)
+    else:
+        m = np.amax(models, axis=0)
+        norml = models/m
+        total = np.sum(norml, axis = 1)
+        order = np.argsort(total)
+        total_error, other = models_all[order[0]]
+        a_fit, r, c_fit = total_error
+        b_start, b_end, slope, a_mean, c_mean = other
+        return  a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r
 
 ## we want model where 3 numbers are min & longest steady-state
 
@@ -73,6 +76,14 @@ y = [0.00000 ,  0.00000,  85.98190  ,93.11778,   0.00000   ,0.00000 ,  0.00000, 
 #d = piecewise(x,y)
 #best_model(d)
 
+def d_test(m3):
+    segment = importr('segmented')
+    stats = importr('stats')
+    formula = 'lac11 ~ vnd7'
+    out_lm = stats.lm(formula, data=m3)
+    #out.lm <- lm( lac11~ vnd7.1, data=m3)
+    segment.davies.test(out_lm, seg.Z = "~vnd7")
+    #davies.test(out.lm, seg.Z = ~vnd7.1)
 
 
 def gene_expression_matrix(dataset):

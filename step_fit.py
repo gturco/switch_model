@@ -11,12 +11,13 @@ def piecewise(xi,yi):
     x = np.array([xs for xs,ys in z])
     y = np.array([ys for xs,ys in z])
     models = []
-   
+
     ## all combinations of models
+    # x axis needs to be a set to iterate through
     i = set(x)
     i = list(i)
     i.sort()
-
+    ## testing every two combinations of points of X for breakpoints
     for ia, ib in itertools.combinations(i,2):
         ya = y[x <= ia]
         yc = y[x >= ib]
@@ -28,9 +29,9 @@ def piecewise(xi,yi):
         #print ya, yb, yc
 
         ## models
-        a = np.mean(ya)
+        a = np.median(ya)
         slope, intercept, r_value, p_value, std_err = stats.linregress(xb,yb)
-        c = np.mean(yc)
+        c = np.median(yc)
 
         ## error
         se_a = sum(a - ya)**2
@@ -46,6 +47,7 @@ def piecewise(xi,yi):
 def best_model(models_all):
     models = [m for m,i in models_all]
     if len(models) <= 0:
+        ## if there are no models with a slope > 1
         return np.repeat("NA" , 8)
     else:
         m = np.amax(models, axis=0)
@@ -74,9 +76,9 @@ y = [0.00000 ,  0.00000,  85.98190  ,93.11778,   0.00000   ,0.00000 ,  0.00000, 
 85.97513  , 0.00000  ,72.91498 ,  0.00000, 100.00000 ,  0.00000  ,89.06269  , 0.00000 ,  0.00000  , 0.00000,   0.00000  , 0.00000 ,  0.00000  , 0.00000,
 100.00000 ,100.00000 ,100.00000,  99.52622 , 94.73365,   0.00000]
 
-#d = piecewise(x,y)
-#best_model(d)
-
+d = piecewise(x,y)
+a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r = best_model(d)
+print(a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r)
 #def d_test(m3):
 #    segment = importr('segmented')
 #    stats = importr('stats')
@@ -102,6 +104,6 @@ def gene_expression_matrix(dataset):
         print(line)
 
 
-d = "/Users/gturco/Documents/Projects/switch_model/data/all_nonscale_merged.txt"
-gene_expression_matrix(d)
+#d = "/Users/gturco/Documents/Projects/switch_model/data/all_nonscale_merged.txt"
+#gene_expression_matrix(d)
 

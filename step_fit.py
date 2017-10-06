@@ -2,6 +2,7 @@ import numpy as np
 from scipy import stats
 import itertools
 import pandas as pd
+#from rpy2.robjects.packages import importr
 
 def piecewise(xi,yi):
     z = zip(xi,yi)
@@ -76,32 +77,31 @@ y = [0.00000 ,  0.00000,  85.98190  ,93.11778,   0.00000   ,0.00000 ,  0.00000, 
 #d = piecewise(x,y)
 #best_model(d)
 
-def d_test(m3):
-    segment = importr('segmented')
-    stats = importr('stats')
-    formula = 'lac11 ~ vnd7'
-    out_lm = stats.lm(formula, data=m3)
-    #out.lm <- lm( lac11~ vnd7.1, data=m3)
-    segment.davies.test(out_lm, seg.Z = "~vnd7")
-    #davies.test(out.lm, seg.Z = ~vnd7.1)
+#def d_test(m3):
+#    segment = importr('segmented')
+#    stats = importr('stats')
+#    formula = 'lac11 ~ vnd7'
+#    out_lm = stats.lm(formula, data=m3)
+#    #out.lm <- lm( lac11~ vnd7.1, data=m3)
+#    segment.davies.test(out_lm, seg.Z = "~vnd7")
+#    #davies.test(out.lm, seg.Z = ~vnd7.1)
 
 
 def gene_expression_matrix(dataset):
     # open file
     df = pd.read_table(dataset)
-    v = df['vnd7']
+    v = df['AT1G71930']
     for column in df:
         ## run davis test
-        print column
         y = df[column]
         m = piecewise(v,y)
         a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r = best_model(m)
         davids = 1
         ##A_mean, A_fit, B_mean, B_fit, C_start, C_end, Slope, r2, davids_test
-        line = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}".format(a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r, davids)
-        print line
+        line = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}".format(column,a_mean, a_fit, c_mean, c_fit, b_start, b_end, slope, r)
+        print(line)
 
 
-d = "/Users/gturco/Documents/Projects/switch_model/data/test.txt"
+d = "/Users/gturco/Documents/Projects/switch_model/data/all_nonscale_merged.txt"
 gene_expression_matrix(d)
 

@@ -56,10 +56,16 @@ o
 
 #### Mike helped me write code on how to find breakpoints that better fit a step model these are the breakpoints from my code, I think they look a lot better :) Here we force two points of refrence and then find the points inbetween that best fit a linear model and the two fixed points. Three segments a:ab,b:bc,and c:cd. Find A and C breakpoints with lowest SE and B to C slope with lowest r-sqaured value. A and C are forced to stay constant, min and max.
 ```{r}
-ggplot(data = xylem_count, aes(VND7_log, y=percent_xylem )) + geom_segment(y= 0, x= 0, xend = 4.8772339999999996, yend = 0, color="grey") +geom_segment(y= 85.29761, x= 5.3666520000000002, xend = 10, yend = 85.29761, color="grey") +  geom_segment(x= 4.8772339999999996, y= 0, xend = 5.3666520000000002, yend = 85.29761, color="grey") + geom_jitter(alpha = 0.7, size=0.2, shape = 4) + theme_bw() + theme(legend.position ="none", text=element_text(size=7), panel.margin = unit(0, "cm"), axis.ticks = element_line(size = 0.1), axis.line = element_line(size = 0.1), axis.ticks.length = unit(0.05, "cm"), axis.ticks.margin =unit(0, "cm")) + xlab(NULL) + ylab(NULL)
+x <- sort(xylem$VND7_log)[35:50]
+y <- xylem$percent_xylem[order(xylem$VND7_log)][35:50]
 
-x <- sort(xylem$VND7_log)[21:34]
-y <- xylem$percent_xylem[order(xylem$VND7_log)][21:34]
+d = data.frame(x,y)
+
+
+ggplot(data = xylem, aes(VND7_log, y=percent_xylem )) + geom_segment(y= 0, x= 0, xend = 5.3666520000000002, yend = 0, color="grey") +geom_segment(y= 88.350184999999996, x= 6.5856539999999999, xend = 10, yend = 88.350184999999996, color="grey") +  geom_segment(x= 5.3666520000000002, y= 0, xend = 6.5856539999999999, yend = 85.29761, color="grey")  + geom_jitter(alpha = 0.7, size=0.2, shape = 4) + geom_vline(xintercept = 5.3666520000000002) + geom_vline(xintercept = 6.5856539999999999) + theme_bw() + theme(legend.position ="none", text=element_text(size=7), panel.margin = unit(0, "cm"), axis.ticks = element_line(size = 0.1), axis.line = element_line(size = 0.1), axis.ticks.length = unit(0.05, "cm"), axis.ticks.margin =unit(0, "cm")) + xlab(NULL) + ylab(NULL) 
+
+
+ggplot(data = xylem, aes(VND7_log, y=percent_xylem )) + geom_segment(y= 0, x= 0, xend = 5.3666520000000002, yend = 0, color="grey") +geom_segment(y= 88.350184999999996, x= 6.5856539999999999, xend = 10, yend = 88.350184999999996, color="grey") +  geom_segment(x= 5.3666520000000002, y= 0, xend = 6.5856539999999999, yend = 85.29761, color="grey")  + geom_jitter(alpha = 0.7, size=0.2, shape = 4) + geom_vline(xintercept = 5.3666520000000002) + geom_vline(xintercept = 6.5856539999999999) + theme_bw() + geom_abline(intercept = 17.693, slope=22.9)
 
 summary(lm(y~x))
 
@@ -72,6 +78,30 @@ summary(lm(y~x))
 #### Stochastic noise and variance for a switch with log-log values expect to see low noise at the min and max vlaues and more noise at switch. We expect the SE at these points to be double  if switch and half the amount if the relationship is more linear.
 
 #### This is what I have so far for binning data but need to repeat with log-log values
+```{r}
+
+x <- sort(xylem$VND7_log)[29:52]
+y <- xylem$percent_xylem[order(xylem$VND7_log)][29:52]
+
+
+plot(x,y)
+abline(lm(y~x))
+
+l<- lm(percent_xylem~VND7_log, data = xylem[28:52,])
+newdat= data.frame(VND7_log = seq(from = 5.3, to = 6.5, by = 0.01))
+newdat$percent_xylem <- predict(l, newdata=newdat)
+
+ggplot(data = xylem, aes(VND7_log, y=percent_xylem )) + geom_segment(y= 0, x= 0, xend = 5.3666520000000002, yend = 0, color="grey") +geom_segment(y= 88.350184999999996, x= 6.5856539999999999, xend = 10, yend = 88.350184999999996, color="grey") +  geom_segment(x= 5.3666520000000002, y= 0, xend = 6.5856539999999999, yend = 85.29761, color="grey")  + geom_jitter(alpha = 0.7, shape = 4)  + theme_bw()  + geom_line(data=newdat)
+
+
+ggplot(data = xylem, aes(VND7_log, y=percent_xylem )) + geom_segment(y= 0, x= 0, xend = 5.3666520000000002, yend = 0, color="grey") +geom_segment(y= 88.350184999999996, x= 6.5856539999999999, xend = 10, yend = 88.350184999999996, color="grey") +  geom_segment(x= 5.3666520000000002, y= 0, xend = 6.5856539999999999, yend = 85.29761, color="grey")  + geom_jitter(alpha = 0.7, shape = 4)  + theme_bw()  + xlim(5.3,7) 
+
+
+
+
+```
+
+Add in the points before and after so linear model can better fit the data points...
 
 ```{r}
 
@@ -96,5 +126,53 @@ SE <- unlist(y)
 z <- data.frame(SE,windows)
 z <- na.omit(z)
 
-ggplot(z,aes(windows,SE)) + geom_point()
+ggplot(z,aes(windows,SE))  + geom_point( size=0.2) + theme_bw() + theme(legend.position ="none", text=element_text(size=7), panel.margin = unit(0, "cm"), axis.ticks = element_line(size = 0.1), axis.line = element_line(size = 0.1), axis.ticks.length = unit(0.05, "cm"), axis.ticks.margin =unit(0, "cm")) + xlab(NULL) + ylab(NULL)
+
+ggsave("/Users/gturco/Documents/Projects/xylem_R_figures/Figure_1/Switch_var.pdf", width=4.70, height=1.6, dpi=600, units="cm") 
+```
+
+## How does the R package do this???
+
+```{r}
+x <- c(1:10, 13:22)
+y <- numeric(20)
+## Create first segment
+y[1:10] <- 20:11 + rnorm(10, 0, 1.5)
+## Create second segment
+y[11:20] <- seq(11, 15, len=10) + rnorm(10, 0, 1.5)
+## Plot it
+par(mar=c(4,4,1,1)+0.2)
+plot(x,y, ylim=c(5, 20), pch=16)
+
+
+breaks <- x[which(x >= 9 & x <= 17)]
+
+mse <- numeric(length(breaks))
+for(i in 1:length(breaks)){
+ piecewise1 <- lm(y ~ x*(x < breaks[i]) + x*(x>=breaks[i]))
+ mse[i] <- summary(piecewise1)[6]
+}
+mse <- as.numeric(mse)
+
+breaks[which(mse==min(mse))]
+
+ x < 15TRUE, or 3.3133 + 16.6352 = 19.9485
+ The slope of the line when x < 15 is x + x:x<15TRUE, 0.5843 – 1.3025 = -0.7182. 
+ when x is less than 15, the formula is 19.9485 – 0.7182x.
+
+
+piecewise2 <- lm(y ~ (x < 15)*x + (x > 15)*x)
+summary(piecewise2)
+
+x<15 :  (Intercept) + x < 15 TRUE
+         (1.4184 + 18.6748)
+ 
+x < 15 is x + x:x<15TRUE        
+
+(0.6496 + -1.0864)*x
+
+plot(x,y, ylim=c(5, 20), pch=16)
+curve((3.3133 + 16.6352) + (0.5843-1.3025)*x, add=T, from=1, to=15)
+curve((3.3133 - 0.9116) + 0.5843*x, add=T, from=15, to=max(x))
+abline(v=15, lty=3)
 ```
